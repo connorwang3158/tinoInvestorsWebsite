@@ -54,3 +54,22 @@ if (nextMeeting) {
     : date.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" });
   nextMeeting.textContent = `${label} at lunch`;
 }
+
+// Keep the address bar clean: menu links scroll to their section without adding "#about" to the URL
+document.querySelectorAll('.nav a[href^="#"]').forEach((link) => {
+  link.addEventListener("click", (event) => {
+    const target = document.getElementById(link.getAttribute("href").slice(1));
+    if (!target) return;
+    event.preventDefault();
+    target.scrollIntoView({ behavior: "smooth" });
+  });
+});
+
+// Arriving from another page through "./#about": scroll there once everything has loaded, then drop the "#about"
+if (location.hash) {
+  window.addEventListener("load", () => {
+    const target = document.getElementById(location.hash.slice(1));
+    if (target) target.scrollIntoView();
+    history.replaceState(null, "", location.pathname + location.search);
+  });
+}
