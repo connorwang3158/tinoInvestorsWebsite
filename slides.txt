@@ -1,0 +1,19 @@
+# Meeting slides for the Resources page
+#
+# To add a meeting, put one line at the bottom of this file:
+#
+#   date | title | link
+#
+# For example:
+#
+#   2026-11-18 | Intro to the stock market | https://docs.google.com/presentation/d/your-slides-id
+#
+# - Write the date as YEAR-MONTH-DAY (2026-11-18).
+# - The order of lines doesn't matter. The page always shows the newest meeting first.
+# - Pasting only a link also works. It shows up as "Meeting slides" with no date.
+# - Lines starting with # (like these) are notes and never show on the site.
+# - Make sure the slides are shared as "Anyone with the link can view" so members can open them.
+#
+# Once officer editing is set up (see EDITING.md), it's easier to add slides on the Resources page
+# itself. This file is only used until slides are saved there for the first time.
+

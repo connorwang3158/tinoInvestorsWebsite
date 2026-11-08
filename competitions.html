@@ -15,122 +15,169 @@
   <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Belanosima:wght@400;600&family=Lexend:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Belanosima:wght@600&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&display=swap">
   <link rel="stylesheet" href="css/style.css">
+  <script type="module" src="js/cms.js"></script>
 </head>
-<body>
+<body data-cms="competitions">
   <a class="skip-link" href="#main">Skip to content</a>
-  <header class="site-header">
-    <div class="header-in">
-      <a class="brand" href="./">Tino Investors</a>
-      <nav class="nav" aria-label="Main">
-        <a href="./#about">About</a>
-        <a href="officers.html">Officers</a>
-        <a href="competitions.html" aria-current="page">Competitions</a>
-        <a href="resources.html">Resources</a>
-        <a href="./#contact">Contact</a>
-      </nav>
-      <div class="navsocial">
-        <a href="mailto:tinoinvestors@gmail.com" aria-label="Email Tino Investors">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
-        </a>
-      </div>
+
+  <div class="utility">
+    <div class="page utility-in">
+      <a href="mailto:tinoinvestors@gmail.com"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>tinoinvestors@gmail.com</a>
+      <span><a href="https://chs.fuhsd.org/">Cupertino High School</a> • <a href="https://www.fuhsd.org/about-us/general-information/calendar">FUHSD Calendar</a></span>
+    </div>
+  </div>
+
+  <header class="masthead">
+    <div class="page masthead-in">
+      <a class="wordmark" href="./">
+        <img src="assets/logo.webp" alt="" width="88" height="88">
+        <span>
+          <span class="wordmark-name">Tino Investors</span>
+          <span class="wordmark-line">Investing Club</span>
+          <span class="wordmark-small">at Cupertino High School</span>
+        </span>
+      </a>
+      <ul class="quick">
+        <li><a href="./#markets"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4v16h16"/><path d="m8 15 4-5 3 3 5-6"/></svg>Markets</a></li>
+        <li><a href="competitions.html"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 21h8M12 17v4"/><path d="M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M7 6H4a3 3 0 0 0 3 4M17 6h3a3 3 0 0 1-3 4"/></svg>Competitions</a></li>
+        <li><a href="resources.html"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="1"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>Slides</a></li>
+        <li><a href="officers.html"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0"/><circle cx="17" cy="9" r="2.5"/><path d="M16 14a5 5 0 0 1 5 5"/></svg>Officers</a></li>
+        <li><a href="mailto:tinoinvestors@gmail.com"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>Email</a></li>
+      </ul>
     </div>
   </header>
 
-  <main id="main">
-    <div class="hero">
-      <h1 class="hero-title">Competitions</h1>
-      <p class="hero-sub">Investing competitions open to high school students. Interested in forming a team? <a href="mailto:tinoinvestors@gmail.com">Email us</a>.</p>
-    </div>
+  <nav class="mainnav" aria-label="Main">
+    <ul class="page">
+      <li><a href="./">Home</a></li>
+      <li><a href="./#about">About</a></li>
+      <li><a href="officers.html">Officers</a></li>
+      <li><a href="competitions.html" aria-current="page">Competitions</a></li>
+      <li><a href="resources.html">Resources</a></li>
+      <li><a href="./#contact">Contact</a></li>
+    </ul>
+  </nav>
 
-    <div class="page-list">
+  <main id="main" class="page content">
+    <nav class="crumbs" aria-label="Breadcrumb"><a href="./">Home</a> » Competitions</nav>
+    <h1 class="page-title">Competitions</h1>
+    <p class="intro">Investing competitions open to high school students. Interested in forming a team? <a href="mailto:tinoinvestors@gmail.com">Email us</a>.</p>
+
+    <div class="comp-list" data-cms-list aria-busy="true">
       <article class="comp">
-        <div class="comp-logo"><img src="assets/logos/yis.svg" alt="Young Investors Society"></div>
+        <div class="comp-logo" data-src="assets/logos/yis.svg"><img src="assets/logos/yis.svg" alt="Young Investors Society"></div>
         <div>
           <h2 class="comp-name">Global Stock Pitch Competition</h2>
           <p class="comp-desc">Research a public company and pitch it as a buy, sell, or hold. Run by the Young Investors Society.</p>
-          <dl class="comp-dates">
-            <dt>Register by</dt><dd class="deadline">Feb 19, 2027</dd>
-            <dt>Registration opens</dt><dd>Dec 15, 2026</dd>
-            <dt>Pitch due</dt><dd>Feb 19, 2027, 11:59 PM PT</dd>
-            <dt>Finals</dt><dd>May 25–26, 2027 in New York City (top 100 teams)</dd>
-          </dl>
-          <a class="plink" href="https://yis.org/programs/stock-pitch-competition/" target="_blank" rel="noopener">yis.org</a>
+          <ul class="raquo comp-dates">
+            <li><b class="date-label">Register by</b> <span class="date-value">Feb 19, 2027</span></li>
+            <li><b class="date-label">Registration opens</b> <span class="date-value">Dec 15, 2026</span></li>
+            <li><b class="date-label">Pitch due</b> <span class="date-value">Feb 19, 2027, 11:59 PM PT</span></li>
+            <li><b class="date-label">Finals</b> <span class="date-value">May 25–26, 2027 in New York City (top 100 teams)</span></li>
+            <li class="comp-site"><b class="date-label">Website</b> <a class="comp-link" href="https://yis.org/programs/stock-pitch-competition/" target="_blank" rel="noopener">yis.org</a></li>
+          </ul>
         </div>
       </article>
 
       <article class="comp">
-        <div class="comp-logo"><img src="assets/logos/npfc.svg" alt="National Personal Finance Challenge"></div>
+        <div class="comp-logo" data-src="assets/logos/npfc.svg"><img src="assets/logos/npfc.svg" alt="National Personal Finance Challenge"></div>
         <div>
           <h2 class="comp-name">National Personal Finance Challenge</h2>
           <p class="comp-desc">A team competition on budgeting, credit, saving, and investing. State winners go on to nationals.</p>
-          <dl class="comp-dates">
-            <dt>Register by</dt><dd class="deadline">2027 dates not posted yet</dd>
-            <dt>Last year</dt><dd>Registration opened Jan 1. National finals were May 31–June 1 in Atlanta.</dd>
-          </dl>
-          <a class="plink" href="https://npfc.councilforeconed.org/student-information/" target="_blank" rel="noopener">councilforeconed.org</a>
+          <ul class="raquo comp-dates">
+            <li><b class="date-label">Register by</b> <span class="date-value">2027 dates not posted yet</span></li>
+            <li><b class="date-label">Last year</b> <span class="date-value">Registration opened Jan 1. National finals were May 31–June 1 in Atlanta.</span></li>
+            <li class="comp-site"><b class="date-label">Website</b> <a class="comp-link" href="https://npfc.councilforeconed.org/student-information/" target="_blank" rel="noopener">councilforeconed.org</a></li>
+          </ul>
         </div>
       </article>
 
       <article class="comp">
-        <div class="comp-logo"><img src="assets/logos/smg.png" alt="The Stock Market Game"></div>
+        <div class="comp-logo" data-src="assets/logos/smg.png"><img src="assets/logos/smg.png" alt="The Stock Market Game"></div>
         <div>
           <h2 class="comp-name">The Stock Market Game</h2>
           <p class="comp-desc">Teams manage a virtual $100,000 portfolio and compete against other schools in the region.</p>
           <!-- Dates from the San Francisco Area program (registration.smgww.org, ZIP 95014) -->
-          <dl class="comp-dates">
-            <dt>Register by</dt><dd class="deadline">Rolling sign-ups. A teacher or club advisor registers the team.</dd>
-            <dt>Spring session</dt><dd>Jan 19 – Apr 9, 2027 (prizes awarded)</dd>
-            <dt>Teams</dt><dd>3 to 5 students, free to play</dd>
-          </dl>
-          <a class="plink" href="https://www.stockmarketgame.org/" target="_blank" rel="noopener">stockmarketgame.org</a>
+          <ul class="raquo comp-dates">
+            <li><b class="date-label">Register by</b> <span class="date-value">Rolling sign-ups. A teacher or club advisor registers the team.</span></li>
+            <li><b class="date-label">Spring session</b> <span class="date-value">Jan 19 – Apr 9, 2027 (prizes awarded)</span></li>
+            <li><b class="date-label">Teams</b> <span class="date-value">3 to 5 students, free to play</span></li>
+            <li class="comp-site"><b class="date-label">Website</b> <a class="comp-link" href="https://www.stockmarketgame.org/" target="_blank" rel="noopener">stockmarketgame.org</a></li>
+          </ul>
         </div>
       </article>
 
       <article class="comp">
-        <div class="comp-logo"><img src="assets/logos/nec.png" alt="National Economics Challenge"></div>
+        <div class="comp-logo" data-src="assets/logos/nec.png"><img src="assets/logos/nec.png" alt="National Economics Challenge"></div>
         <div>
           <h2 class="comp-name">National Economics Challenge</h2>
           <p class="comp-desc">A team economics competition with a state round, then national finals with a case analysis and a quiz bowl.</p>
-          <dl class="comp-dates">
-            <dt>Register by</dt><dd class="deadline">2027 dates not posted yet</dd>
-            <dt>Last year</dt><dd>California registration closed Mar 13, after an online round that started Feb 22. National finals were May 27–29 in Atlanta.</dd>
-          </dl>
-          <a class="plink" href="https://www.councilforeconed.org/nec/" target="_blank" rel="noopener">councilforeconed.org</a>
+          <ul class="raquo comp-dates">
+            <li><b class="date-label">Register by</b> <span class="date-value">2027 dates not posted yet</span></li>
+            <li><b class="date-label">Last year</b> <span class="date-value">California registration closed Mar 13, after an online round that started Feb 22. National finals were May 27–29 in Atlanta.</span></li>
+            <li class="comp-site"><b class="date-label">Website</b> <a class="comp-link" href="https://www.councilforeconed.org/nec/" target="_blank" rel="noopener">councilforeconed.org</a></li>
+          </ul>
         </div>
       </article>
 
       <article class="comp">
-        <div class="comp-logo"><img src="https://globalyouth.wharton.upenn.edu/wp-content/plugins/martech-chupacabra/includes/images/Wharton-Logo-RGB.png" alt="The Wharton School" onerror="this.replaceWith('Wharton')"></div>
+        <div class="comp-logo" data-src="https://globalyouth.wharton.upenn.edu/wp-content/plugins/martech-chupacabra/includes/images/Wharton-Logo-RGB.png"><img src="https://globalyouth.wharton.upenn.edu/wp-content/plugins/martech-chupacabra/includes/images/Wharton-Logo-RGB.png" alt="The Wharton School" onerror="this.replaceWith('Wharton')"></div>
         <div>
           <h2 class="comp-name">Wharton Global High School Investment Competition</h2>
           <p class="comp-desc">Teams manage a simulated portfolio for a client over about ten weeks and present their strategy. Free to enter.</p>
-          <dl class="comp-dates">
-            <dt>Register by</dt><dd class="deadline">Sept 11, 2026 (closed for this year)</dd>
-            <dt>Final report due</dt><dd>Dec 4, 2026</dd>
-            <dt>Global Finale</dt><dd>Apr 29–30, 2027 in Philadelphia</dd>
-            <dt>Next season</dt><dd>Registration usually opens in early August.</dd>
-          </dl>
-          <a class="plink" href="https://globalyouth.wharton.upenn.edu/competitions/investment-competition/" target="_blank" rel="noopener">wharton.upenn.edu</a>
+          <ul class="raquo comp-dates">
+            <li><b class="date-label">Register by</b> <span class="date-value">Sept 11, 2026 (closed for this year)</span></li>
+            <li><b class="date-label">Final report due</b> <span class="date-value">Dec 4, 2026</span></li>
+            <li><b class="date-label">Global Finale</b> <span class="date-value">Apr 29–30, 2027 in Philadelphia</span></li>
+            <li><b class="date-label">Next season</b> <span class="date-value">Registration usually opens in early August.</span></li>
+            <li class="comp-site"><b class="date-label">Website</b> <a class="comp-link" href="https://globalyouth.wharton.upenn.edu/competitions/investment-competition/" target="_blank" rel="noopener">wharton.upenn.edu</a></li>
+          </ul>
         </div>
       </article>
-
-      <p class="list-note">Organizers can change dates, so confirm on each website before you sign up. Know a competition we should add? Let us know at <a href="mailto:tinoinvestors@gmail.com">tinoinvestors@gmail.com</a>.</p>
     </div>
+
+    <p class="list-note">Organizers can change dates, so confirm on each website before you sign up. Know a competition we should add? Let us know at <a href="mailto:tinoinvestors@gmail.com">tinoinvestors@gmail.com</a>.</p>
   </main>
 
   <footer class="site-footer">
-    <div class="foot-in">
-      <div>
-        <p class="foot-name">Tino Investors</p>
-        <p class="foot-credit">Made by Connor Wang</p>
+    <div class="footband">
+      <div class="page footcols">
+        <div>
+          <h2 class="foot-head">Tino Investors</h2>
+          <ul>
+            <li><a href="./#about">About</a></li>
+            <li><a href="officers.html">Officers</a></li>
+            <li><a href="competitions.html">Competitions</a></li>
+            <li><a href="resources.html">Meeting slides</a></li>
+            <li><a href="./#contact">Contact</a></li>
+          </ul>
+        </div>
+        <div>
+          <h2 class="foot-head">Competitions</h2>
+          <ul>
+            <li><a href="https://yis.org/programs/stock-pitch-competition/">YIS Global Stock Pitch</a></li>
+            <li><a href="https://www.stockmarketgame.org/">The Stock Market Game</a></li>
+            <li><a href="https://www.councilforeconed.org/nec/">National Economics Challenge</a></li>
+            <li><a href="https://npfc.councilforeconed.org/student-information/">Personal Finance Challenge</a></li>
+            <li><a href="https://globalyouth.wharton.upenn.edu/competitions/investment-competition/">Wharton Investment Competition</a></li>
+          </ul>
+        </div>
+        <div>
+          <h2 class="foot-head">Cupertino High</h2>
+          <ul>
+            <li><a href="https://chs.fuhsd.org/">Cupertino High School</a></li>
+            <li><a href="https://www.fuhsd.org/about-us/general-information/calendar">FUHSD school calendar</a></li>
+          </ul>
+        </div>
       </div>
-      <div class="foot-links">
-        <a href="mailto:tinoinvestors@gmail.com">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
-          Email
-        </a>
+    </div>
+    <div class="footbar">
+      <div class="page footbar-in">
+        <img src="assets/logo.webp" alt="" width="72" height="72">
+        <p>Tino Investors<br>Cupertino High School<br>10100 Finch Avenue, Cupertino, CA 95014</p>
+        <p><a href="mailto:tinoinvestors@gmail.com">tinoinvestors@gmail.com</a><br>Made by Connor Wang<br>Managed by Connor Wang<br>Last updated November 2026</p>
       </div>
     </div>
   </footer>
