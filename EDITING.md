@@ -1,16 +1,24 @@
 # Editing the site
 
-Officers can change the **Officers**, **Competitions** and **Resources** pages right on the website.
-Sign in with the club Google account (tinoinvestors@gmail.com), click the text you want to change,
-and save. Photos and logos can be swapped too. No other account can save anything.
+Officers can change the **homepage** and the **Officers**, **Competitions** and **Resources** pages right on
+the website. Sign in with the club Google account (tinoinvestors@gmail.com), click the text you want to
+change, and save. Pictures can be added and swapped too. No other account can save anything.
 
 Changes are stored in Firebase (Google's free app backend). It needs a one-time setup, below.
 
 ## Using the editor
 
-1. Open the Officers, Competitions or Resources page.
+1. Open the homepage, Officers, Competitions or Resources page **in a regular browser** like Chrome.
+   (Google sign-in doesn't work inside apps with built-in browsers.)
 2. Click **Officer Login** in the gray bar at the top right and sign in with tinoinvestors@gmail.com.
 3. Anything with a dotted green outline can be edited. Click it and type.
+   - **Homepage:** the banner, title, About Us, How to join, This Year, the Start Here boxes and Contact Us.
+     Use the **Text tools** row in the black bar for **Bold**, **Italic**, **Link**, **Bullet list** and
+     **Insert image** (the picture goes where your cursor is; click a picture and press Delete to remove it).
+     **Change image** under the big box at the top adds the club group photo (it's blank until someone does,
+     and the whole photo shows without being cropped), and
+     **Change image** under the QR code swaps it. The QR code opens whatever the link under it points to.
+     The officer list on the homepage updates itself from the Officers page.
    - **Officers:** name, role and bio. **Change photo** uploads a headshot (any size works; it's shrunk automatically).
    - **Competitions:** name, description, each date line, and the website link. **Change logo** swaps the logo,
      and **+ Add a date line** adds a line like "Register by: Feb 19".
@@ -51,11 +59,11 @@ service cloud.firestore {
     match /site/{page} {
       // Anyone can read the saved pages, so every visitor sees them
       allow read: if true;
-      // Only the club account can save, and only these three pages
+      // Only the club account can save, and only these four pages
       allow write: if request.auth != null
         && request.auth.token.email == 'tinoinvestors@gmail.com'
         && request.auth.token.email_verified == true
-        && page in ['officers', 'competitions', 'resources'];
+        && page in ['home', 'officers', 'competitions', 'resources'];
     }
   }
 }
@@ -64,7 +72,8 @@ service cloud.firestore {
 ## Good to know
 
 - **Cost:** the free Spark plan is plenty. Photos are shrunk and saved with the page, so Firebase Storage
-  (which needs a paid plan) isn't used.
+  (which needs a paid plan) isn't used. Each page can hold about 1 MB, which is roughly 6 to 8 pictures
+  added to the homepage text; the editor says so if a page gets too big to save.
 - **Safety:** the values in `js/firebase-config.js` are meant to be public. The rules above are what stop
   anyone else from saving.
 - **Changing the editor account:** update `EDITOR_EMAIL` in `js/firebase-config.js` and the email in the rules.

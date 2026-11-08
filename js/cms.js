@@ -1,8 +1,8 @@
-// Officer editing for the Officers, Competitions and Resources pages.
+// Officer editing for the homepage and the Officers, Competitions and Resources pages.
 //
-// Visitors: if the club has saved a version of this page's list, it's loaded from Firestore and shown
-// in place of the list written in the HTML (or slides.txt on the Resources page).
-// Officers: "Officer Login" in the top bar signs in with the club Google account, and the list becomes
+// Visitors: if the club has saved a version of a page, it's loaded from Firestore and shown in place of
+// what's written in the HTML (or slides.txt on the Resources page).
+// Officers: "Officer Login" in the top bar signs in with the club Google account, and the page becomes
 // editable in place. Only that account can save; the Firestore rules in EDITING.md enforce it.
 import { firebaseConfig, EDITOR_EMAIL } from "./firebase-config.js";
 
@@ -392,13 +392,14 @@ export function renderList(items) {
   list.replaceChildren(...shown.map((item) => type.render(item)));
 }
 
-async function fetchSaved() {
+// A saved page looks like { items: [...] } for the list pages and { fields: {...}, images: {...} } for the homepage
+async function fetchSaved(name = page) {
   const { projectId, apiKey } = firebaseConfig;
-  const url = `https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents/site/${page}?key=${apiKey}`;
+  const url = `https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents/site/${name}?key=${apiKey}`;
   const response = await fetch(url, { cache: "no-store" });
   if (!response.ok) return null; // 404 means nothing has been saved for this page yet
   const saved = await response.json();
-  return JSON.parse(saved.fields.json.stringValue).items;
+  return JSON.parse(saved.fields.json.stringValue);
 }
 
 // slides.txt: one meeting per line, "date | title | link" (see the notes at the top of that file)
@@ -420,6 +421,258 @@ async function loadSlidesFile() {
   } catch {
     return [];
   }
+}
+
+/* ---------- Free-form text and pictures (homepage) ---------- */
+// In the HTML: data-cms-field="name" marks editable text (add data-cms-mode="rich" to allow bold, links,
+// lists and pictures), and data-cms-image="name" marks a picture that can be swapped.
+
+const RICH_TAGS = {
+  P: [], BR: [], B: [], STRONG: [], I: [], EM: [], U: [], H3: [], UL: [], OL: [], LI: [], DIV: [], SPAN: [],
+  A: ["href"],
+  IMG: ["src", "alt"],
+};
+const DROP_TAGS = ["SCRIPT", "STYLE", "IFRAME", "OBJECT", "EMBED", "TEMPLATE", "LINK", "META", "SVG", "MATH", "FORM", "INPUT", "BUTTON", "TEXTAREA", "SELECT"];
+
+let activeField = null;
+let savedRange = null;
+
+const fieldNodes = () => [...document.querySelectorAll("[data-cms-field]")];
+const imageNodes = () => [...document.querySelectorAll("[data-cms-image]")];
+
+function escapeHtml(text) {
+  return text.replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char]);
+}
+
+function safeHref(href) {
+  return /^(https?:\/\/|mailto:|#|\.\/|[\w-]+\.html(#[\w-]*)?$)/i.test(href || "") ? href : "";
+}
+
+// Keeps only simple formatting, links and pictures, so saved text can never run code on the page
+function sanitize(html) {
+  const root = new DOMParser().parseFromString(`<div>${html}</div>`, "text/html").body.firstChild;
+  const clean = (node) => {
+    [...node.childNodes].forEach((child) => {
+      if (child.nodeType === Node.TEXT_NODE) return;
+      if (child.nodeType !== Node.ELEMENT_NODE) return child.remove();
+      const tag = child.tagName.toUpperCase();
+      if (DROP_TAGS.includes(tag)) return child.remove();
+      clean(child);
+      const allowed = RICH_TAGS[tag];
+      if (!allowed) return child.replaceWith(...child.childNodes);
+      [...child.attributes].forEach((attr) => {
+        if (!allowed.includes(attr.name)) child.removeAttribute(attr.name);
+      });
+      if (tag === "A") {
+        const href = safeHref(child.getAttribute("href"));
+        if (!href) return child.replaceWith(...child.childNodes);
+        if (/^https?:/i.test(href)) {
+          child.target = "_blank";
+          child.rel = "noopener";
+        }
+      }
+      if (tag === "IMG" && !safeImage(child.getAttribute("src"))) child.remove();
+      if (tag === "UL") child.className = "raquo";
+    });
+  };
+  clean(root);
+  return root.innerHTML;
+}
+
+export function applySaved(saved) {
+  fieldNodes().forEach((node) => {
+    const value = saved.fields?.[node.dataset.cmsField];
+    if (typeof value !== "string") return;
+    if (node.dataset.cmsMode === "rich") node.innerHTML = sanitize(value);
+    else node.textContent = value;
+  });
+  imageNodes().forEach((img) => {
+    const value = saved.images?.[img.dataset.cmsImage];
+    if (value === undefined) return;
+    const src = safeImage(value);
+    if (src) img.src = src;
+    else img.removeAttribute("src"); // saved as removed: the spot stays blank
+  });
+  syncLinks();
+}
+
+// A link that follows the first link in a field (the QR code opens whatever its caption links to)
+function syncLinks() {
+  document.querySelectorAll("[data-cms-link-from]").forEach((link) => {
+    const href = document.querySelector(`[data-cms-field="${link.dataset.cmsLinkFrom}"] a[href]`)?.getAttribute("href");
+    if (href) link.href = href;
+  });
+}
+
+function collectFields() {
+  return Object.fromEntries(fieldNodes().map((node) => [
+    node.dataset.cmsField,
+    node.dataset.cmsMode === "rich" ? sanitize(node.innerHTML) : textOf(node),
+  ]));
+}
+
+function collectImages() {
+  return Object.fromEntries(imageNodes().map((img) => [img.dataset.cmsImage, img.getAttribute("src") || ""]));
+}
+
+// The homepage officer list follows whatever was saved on the Officers page
+function renderTeam(officerItems) {
+  const team = document.querySelector("[data-cms-officers]");
+  if (!team || !officerItems?.length) return;
+  team.replaceChildren(...officerItems.flatMap((officer) => [el("dt", "", officer.role), el("dd", "", officer.name)]));
+}
+
+function rememberSelection() {
+  const selection = getSelection();
+  if (!selection.rangeCount) return;
+  const anchor = selection.anchorNode;
+  const start = anchor && (anchor.nodeType === Node.ELEMENT_NODE ? anchor : anchor.parentElement);
+  const field = start?.closest('[data-cms-mode="rich"]');
+  if (field) {
+    activeField = field;
+    savedRange = selection.getRangeAt(0).cloneRange();
+  }
+}
+
+function restoreSelection() {
+  if (!activeField || !savedRange) return false;
+  activeField.focus();
+  const selection = getSelection();
+  selection.removeAllRanges();
+  selection.addRange(savedRange);
+  return true;
+}
+
+function enableFields() {
+  fieldNodes().forEach((node) => {
+    if (node.dataset.cmsMode !== "rich") {
+      editable(node, "Text");
+      return;
+    }
+    node.contentEditable = "true";
+    node.classList.add("cms-editable", "cms-rich");
+    node.dataset.placeholder = "Type here";
+    node.addEventListener("input", markDirty);
+    node.addEventListener("paste", (event) => {
+      event.preventDefault();
+      const html = event.clipboardData.getData("text/html");
+      if (html) document.execCommand("insertHTML", false, sanitize(html));
+      else document.execCommand("insertText", false, event.clipboardData.getData("text/plain"));
+    });
+    // Clicking a picture selects it, so Delete or Backspace removes it
+    node.addEventListener("click", (event) => {
+      if (event.target.tagName !== "IMG") return;
+      const range = document.createRange();
+      range.selectNode(event.target);
+      getSelection().removeAllRanges();
+      getSelection().addRange(range);
+    });
+  });
+  document.addEventListener("selectionchange", rememberSelection);
+  document.execCommand("defaultParagraphSeparator", false, "p");
+
+  // Links around swappable pictures shouldn't open while editing
+  document.addEventListener("click", (event) => {
+    if (event.target.closest("[data-cms-link-from]")) event.preventDefault();
+  }, true);
+
+  imageNodes().forEach((img) => {
+    const picker = el("input");
+    picker.type = "file";
+    picker.accept = "image/*";
+    picker.hidden = true;
+    picker.addEventListener("change", async () => {
+      const file = picker.files[0];
+      picker.value = "";
+      if (!file) return;
+      try {
+        setStatus("Shrinking the image…");
+        img.src = await shrinkImage(file, Number(img.dataset.cmsMax) || 600);
+        markDirty();
+      } catch {
+        setStatus("That file couldn't be opened as an image. Try a JPG or PNG.");
+      }
+    });
+    const tools = el("div", "cms-tools cms-image-tools");
+    tools.append(
+      button("Change image", () => picker.click()),
+      button("Remove image", () => {
+        img.removeAttribute("src");
+        markDirty();
+      }),
+      picker,
+    );
+    (img.closest("a, .hero-photo") || img).after(tools);
+  });
+}
+
+function formatToolbar() {
+  const bar = el("div", "cms-format");
+  bar.append(el("span", "cms-format-label", "Text tools:"));
+  const command = (label, run) => {
+    const node = button(label, () => {
+      if (!activeField) {
+        setStatus("Click into a text box first, then use the text tools.");
+        return;
+      }
+      run();
+    });
+    node.addEventListener("mousedown", (event) => event.preventDefault()); // keeps the cursor in the text
+    return node;
+  };
+  const picker = el("input");
+  picker.type = "file";
+  picker.accept = "image/*";
+  picker.hidden = true;
+  picker.addEventListener("change", async () => {
+    const file = picker.files[0];
+    picker.value = "";
+    if (!file) return;
+    try {
+      setStatus("Shrinking the image…");
+      const src = await shrinkImage(file, 900);
+      restoreSelection();
+      document.execCommand("insertImage", false, src);
+      markDirty();
+      setStatus("Image added. To remove it, click the image and press Delete.");
+    } catch {
+      setStatus("That file couldn't be opened as an image. Try a JPG or PNG.");
+    }
+  });
+  bar.append(
+    command("Bold", () => {
+      document.execCommand("bold");
+      markDirty();
+    }),
+    command("Italic", () => {
+      document.execCommand("italic");
+      markDirty();
+    }),
+    command("Link", () => {
+      const url = (prompt("Link address (https://… or mailto:someone@gmail.com)") || "").trim();
+      if (!url) return;
+      if (!safeHref(url)) {
+        setStatus("Links need to start with https:// or mailto:");
+        return;
+      }
+      restoreSelection();
+      if (getSelection().isCollapsed) document.execCommand("insertHTML", false, `<a href="${escapeHtml(url)}">${escapeHtml(url)}</a>`);
+      else document.execCommand("createLink", false, url);
+      markDirty();
+    }),
+    command("Bullet list", () => {
+      document.execCommand("insertUnorderedList");
+      markDirty();
+    }),
+    command("Insert image", () => picker.click()),
+    command("Clear formatting", () => {
+      document.execCommand("removeFormat");
+      document.execCommand("unlink");
+      markDirty();
+    }),
+    picker,
+  );
+  return bar;
 }
 
 /* ---------- Signing in and editing ---------- */
@@ -447,12 +700,25 @@ function isEditor(user) {
   return Boolean(user && user.emailVerified && user.email && user.email.toLowerCase() === EDITOR_EMAIL.toLowerCase());
 }
 
+// Sign-in problems show next to the Officer Login link (alert boxes don't appear in every browser)
+let loginNote = null;
+
+function showLoginNote(message) {
+  if (!loginNote) {
+    loginNote = el("span", "cms-login-note");
+    loginNote.setAttribute("role", "alert");
+    document.querySelector(".cms-login")?.after(loginNote);
+  }
+  loginNote.textContent = message;
+}
+
 async function login() {
+  showLoginNote("Opening Google sign-in…");
   let fb;
   try {
     fb = await loadFirebase();
   } catch {
-    alert("Couldn't load the sign-in tools. Check your internet connection and try again.");
+    showLoginNote("Couldn't load the sign-in tools. Check your internet connection and try again.");
     return;
   }
   const provider = new fb.authLib.GoogleAuthProvider();
@@ -461,17 +727,21 @@ async function login() {
     const { user } = await fb.authLib.signInWithPopup(fb.auth, provider);
     if (!isEditor(user)) {
       await fb.authLib.signOut(fb.auth);
-      alert(`${user.email} can't edit this site. Sign in with ${EDITOR_EMAIL}.`);
+      showLoginNote(`${user.email} can't edit this site. Click Officer Login again and choose ${EDITOR_EMAIL}.`);
       return;
     }
     writeFlag(true);
     startEditing(fb, user);
   } catch (error) {
-    if (error.code === "auth/popup-blocked") {
-      alert("Your browser blocked the sign-in window. Click Officer Login again.");
-    } else if (error.code !== "auth/popup-closed-by-user" && error.code !== "auth/cancelled-popup-request") {
-      alert(`Sign-in didn't work (${error.code || error.message}).`);
-    }
+    const messages = {
+      "auth/popup-blocked": "Your browser blocked the Google sign-in window. Allow pop-ups for this site, then click Officer Login again.",
+      "auth/popup-closed-by-user": "The sign-in window was closed before you finished.",
+      "auth/cancelled-popup-request": "The sign-in window was closed before you finished.",
+      "auth/unauthorized-domain": `This address (${location.hostname}) isn't allowed to sign in yet. Add it in Firebase under Authentication, Settings, Authorized domains.`,
+      "auth/operation-not-allowed": "Google sign-in is turned off. Turn it on in Firebase under Authentication, Sign-in method.",
+      "auth/network-request-failed": "Couldn't reach Google. Check your internet connection and try again.",
+    };
+    showLoginNote(messages[error.code] || `Sign-in didn't work (${error.code || error.message}).`);
   }
 }
 
@@ -483,7 +753,9 @@ function addLoginLink() {
   const warmUp = () => loadFirebase().catch(() => {});
   link.addEventListener("pointerenter", warmUp, { once: true });
   link.addEventListener("focus", warmUp, { once: true });
-  spot.append(" • ", link);
+  const wrap = el("span", "cms-login-wrap");
+  wrap.append(" • ", link);
+  spot.append(wrap);
 }
 
 async function resumeSession() {
@@ -499,14 +771,21 @@ async function resumeSession() {
 }
 
 async function save(fb, user) {
-  const items = collectItems();
-  const kept = type.prepare ? type.prepare(items) : items;
-  const skipped = items.length - kept.length;
-  const json = JSON.stringify({ items: kept });
+  const payload = {};
+  let skipped = 0;
+  if (type && list) {
+    const items = collectItems();
+    payload.items = type.prepare ? type.prepare(items) : items;
+    skipped = items.length - payload.items.length;
+  }
+  if (fieldNodes().length) payload.fields = collectFields();
+  if (imageNodes().length) payload.images = collectImages();
+  const json = JSON.stringify(payload);
   if (json.length > 900000) {
-    setStatus("This page is too big to save. Use fewer or smaller images.");
+    setStatus("This page is too big to save. Remove an image or use smaller ones.");
     return;
   }
+  syncLinks();
   setStatus("Saving…");
   try {
     await fb.store.setDoc(fb.store.doc(fb.db, "site", page), {
@@ -525,27 +804,34 @@ async function save(fb, user) {
 
 export function startEditing(fb, user) {
   if (editing) return;
-  const items = collectItems();
+  const items = type && list ? collectItems() : null;
   editing = true;
   document.body.classList.add("cms-editing");
-  document.querySelector(".cms-login")?.remove();
-  renderList(items);
+  document.querySelector(".cms-login-wrap")?.remove();
+  loginNote?.remove();
 
-  const add = button(type.addLabel, () => {
-    const node = type.render(type.blank());
-    if (type.addAtTop) list.prepend(node);
-    else list.append(node);
-    node.querySelector(".cms-editable")?.focus();
-    markDirty();
-  }, "cms-add");
-  list.after(add);
+  if (items) {
+    renderList(items);
+    const add = button(type.addLabel, () => {
+      const node = type.render(type.blank());
+      if (type.addAtTop) list.prepend(node);
+      else list.append(node);
+      node.querySelector(".cms-editable")?.focus();
+      markDirty();
+    }, "cms-add");
+    list.after(add);
+  }
+  if (fieldNodes().length || imageNodes().length) enableFields();
 
   const bar = el("div", "cms-bar");
   bar.setAttribute("role", "region");
   bar.setAttribute("aria-label", "Editing tools");
   const who = el("span", "cms-who");
   who.append("Editing as ", el("strong", "", user.email));
-  statusLine = el("span", "cms-status", "Click any outlined text to change it, then save.");
+  const hint = document.querySelector("[data-cms-officers]")
+    ? "Click any outlined text to change it, then save. Officers are edited on the Officers page."
+    : "Click any outlined text to change it, then save.";
+  statusLine = el("span", "cms-status", hint);
   statusLine.setAttribute("aria-live", "polite");
   bar.append(
     who,
@@ -565,6 +851,7 @@ export function startEditing(fb, user) {
       location.reload();
     }),
   );
+  if (fieldNodes().some((node) => node.dataset.cmsMode === "rich")) bar.append(formatToolbar());
   document.body.prepend(bar);
 
   window.addEventListener("beforeunload", (event) => {
@@ -575,18 +862,24 @@ export function startEditing(fb, user) {
 /* ---------- Start ---------- */
 
 async function init() {
-  if (!type || !list) return;
-  let items = null;
+  if (!page) return;
+  let saved = null;
+  let savedOfficers = null;
   if (configured) {
-    try {
-      items = await fetchSaved();
-    } catch {
-      items = null;
-    }
+    [saved, savedOfficers] = await Promise.all([
+      fetchSaved(page).catch(() => null),
+      document.querySelector("[data-cms-officers]") ? fetchSaved("officers").catch(() => null) : null,
+    ]);
   }
-  if (!items && page === "resources") items = await loadSlidesFile();
-  if (items) renderList(items);
-  list.removeAttribute("aria-busy");
+  if (type && list) {
+    let items = saved?.items || null;
+    if (!items && page === "resources") items = await loadSlidesFile();
+    if (items) renderList(items);
+    list.removeAttribute("aria-busy");
+  }
+  if (saved) applySaved(saved);
+  if (savedOfficers) renderTeam(savedOfficers.items);
+  document.body.classList.remove("cms-pending");
 
   if (!configured) return;
   addLoginLink();

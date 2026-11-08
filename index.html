@@ -18,6 +18,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Belanosima:wght@600&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&display=swap">
   <link rel="stylesheet" href="css/style.css">
   <script src="js/main.js" defer></script>
+  <script type="module" src="js/cms.js"></script>
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -30,7 +31,7 @@
   }
   </script>
 </head>
-<body>
+<body data-cms="home" class="cms-pending">
   <a class="skip-link" href="#main">Skip to content</a>
 
   <div class="utility">
@@ -72,19 +73,25 @@
   </nav>
 
   <main id="main">
+    <!-- Officers can edit the outlined parts of this page with Officer Login (see EDITING.md).
+         Once a version is saved there, it replaces the text written here. -->
     <!-- The next meeting date is filled in by js/main.js (days off go in SKIP_DATES there) -->
-    <p class="banner">2026-27 meetings: <strong>Wednesdays @ Lunch</strong> · Next: <span data-next-meeting>Wednesday at lunch</span></p>
+    <p class="banner"><span data-cms-field="banner" data-cms-mode="rich">2026-27 meetings: <strong>Wednesdays @ Lunch</strong></span> · Next: <span data-next-meeting>Wednesday at lunch</span></p>
 
     <section class="hero page">
-      <img class="hero-logo" src="assets/logo.webp" alt="Tino Investors logo" width="168" height="168">
-      <h1 class="hero-title">Tino Investors</h1>
-      <p class="hero-sub">investing club at CHS</p>
+      <!-- Club group photo: blank until an officer adds one with Officer Login (Change image under the box).
+           The box takes the photo's own shape, so the whole group fits. -->
+      <div class="hero-photo">
+        <img data-cms-image="club-photo" data-cms-max="1400" alt="Tino Investors club group photo">
+      </div>
+      <h1 class="hero-title" data-cms-field="hero-title">Tino Investors</h1>
+      <p class="hero-sub" data-cms-field="hero-sub">investing club at CHS</p>
       <!-- Mailing list sign-up: the QR code and the short link both open the same Google Form -->
       <figure class="hero-qr">
-        <a href="https://tinyurl.com/InvestorsMailingList" target="_blank" rel="noopener">
-          <img src="assets/mailing-list-qr.png" alt="QR code for the Tino Investors mailing list sign-up form" width="190" height="190">
+        <a href="https://tinyurl.com/InvestorsMailingList" target="_blank" rel="noopener" data-cms-link-from="qr-caption">
+          <img data-cms-image="qr" src="assets/mailing-list-qr.png" alt="QR code for the Tino Investors mailing list sign-up form" width="190" height="190">
         </a>
-        <figcaption>
+        <figcaption data-cms-field="qr-caption" data-cms-mode="rich">
           <strong>Join the mailing list</strong>
           <a href="https://tinyurl.com/InvestorsMailingList" target="_blank" rel="noopener">tinyurl.com/InvestorsMailingList</a>
         </figcaption>
@@ -158,17 +165,19 @@
         </aside>
 
         <div class="about-text">
-          <h2 class="section-head">About Us</h2>
-          <p>Tino Investors is Cupertino High School's investing club. We meet every Wednesday at lunch to talk about the markets and get teams ready for competitions. You don't need to know anything about stocks to join.</p>
+          <h2 class="section-head" data-cms-field="about-head">About Us</h2>
+          <div class="about-body" data-cms-field="about" data-cms-mode="rich">
+            <p>Tino Investors is Cupertino High School's investing club. We meet every Wednesday at lunch to talk about the markets and get teams ready for competitions. You don't need to know anything about stocks to join.</p>
+          </div>
           <dl class="meeting-facts">
             <dt>Meetings</dt>
-            <dd>Wednesdays at lunch</dd>
+            <dd data-cms-field="meeting-time">Wednesdays at lunch</dd>
             <dt>Next meeting</dt>
             <dd data-next-meeting>Wednesday at lunch</dd>
             <dt>Email</dt>
             <dd><a href="mailto:tinoinvestors@gmail.com">tinoinvestors@gmail.com</a></dd>
           </dl>
-          <div class="callout">
+          <div class="callout" data-cms-field="join" data-cms-mode="rich">
             <strong>How to join</strong>
             Come to any Wednesday lunch meeting or <a href="mailto:tinoinvestors@gmail.com?subject=Joining%20Tino%20Investors">email us</a>.
           </div>
@@ -179,35 +188,37 @@
     <!-- Update this list each school year -->
     <section class="home-block page">
       <div class="box">
-        <h2 class="box-head">This Year: 2026-27</h2>
+        <h2 class="box-head" data-cms-field="year-head">This Year: 2026-27</h2>
         <div class="box-body">
-          <ul class="raquo">
-            <li><b>Dec 15, 2026:</b> registration opens for the YIS Global Stock Pitch</li>
-            <li><b>Jan 19, 2027:</b> Stock Market Game spring session starts (runs to Apr 9)</li>
-            <li><b>Feb 19, 2027:</b> last day to register and submit for the YIS Global Stock Pitch</li>
-            <li><b>May 25–26, 2027:</b> YIS finals in New York City</li>
-          </ul>
+          <div data-cms-field="year-list" data-cms-mode="rich">
+            <ul class="raquo">
+              <li><b>Dec 15, 2026:</b> registration opens for the YIS Global Stock Pitch</li>
+              <li><b>Jan 19, 2027:</b> Stock Market Game spring session starts (runs to Apr 9)</li>
+              <li><b>Feb 19, 2027:</b> last day to register and submit for the YIS Global Stock Pitch</li>
+              <li><b>May 25–26, 2027:</b> YIS finals in New York City</li>
+            </ul>
+          </div>
           <a class="more" href="competitions.html">all competitions and deadlines →</a>
         </div>
       </div>
     </section>
 
     <section class="home-block page">
-      <h2 class="section-head">Start Here</h2>
+      <h2 class="section-head" data-cms-field="start-head">Start Here</h2>
       <div class="cards">
-        <div class="card">
+        <div class="card" data-cms-field="card-1" data-cms-mode="rich">
           <h3><a href="resources.html">Meeting Slides</a></h3>
           <p>Slides from every meeting, newest first. Missed one? Catch up here.</p>
         </div>
-        <div class="card">
+        <div class="card" data-cms-field="card-2" data-cms-mode="rich">
           <h3><a href="competitions.html">Competitions</a></h3>
           <p>Investing contests open to high schoolers, with their registration deadlines.</p>
         </div>
-        <div class="card">
+        <div class="card" data-cms-field="card-3" data-cms-mode="rich">
           <h3><a href="officers.html">Officers</a></h3>
           <p>Who runs the club, with a short bio from each of us.</p>
         </div>
-        <div class="card">
+        <div class="card" data-cms-field="card-4" data-cms-mode="rich">
           <h3>Meeting Times</h3>
           <p>Wednesdays at lunch. Days off follow the <a href="https://www.fuhsd.org/about-us/general-information/calendar">FUHSD calendar</a>.</p>
         </div>
@@ -215,8 +226,9 @@
     </section>
 
     <section class="home-block page">
-      <h2 class="section-head">The Officer Team</h2>
-      <dl class="team-list">
+      <h2 class="section-head" data-cms-field="team-head">The Officer Team</h2>
+      <!-- This list updates itself from the Officers page once officers are saved there -->
+      <dl class="team-list" data-cms-officers>
         <dt>President</dt>
         <dd>Rishabh Tiwari</dd>
         <dt>Vice President</dt>
@@ -232,12 +244,14 @@
     </section>
 
     <section class="home-block page" id="contact">
-      <h2 class="section-head">Contact Us</h2>
-      <ul class="raquo">
-        <li>Email: <a href="mailto:tinoinvestors@gmail.com">tinoinvestors@gmail.com</a></li>
-        <li>Meetings: Wednesdays at lunch at Cupertino High School</li>
-        <li>School website: <a href="https://chs.fuhsd.org/">chs.fuhsd.org</a></li>
-      </ul>
+      <h2 class="section-head" data-cms-field="contact-head">Contact Us</h2>
+      <div data-cms-field="contact" data-cms-mode="rich">
+        <ul class="raquo">
+          <li>Email: <a href="mailto:tinoinvestors@gmail.com">tinoinvestors@gmail.com</a></li>
+          <li>Meetings: Wednesdays at lunch at Cupertino High School</li>
+          <li>School website: <a href="https://chs.fuhsd.org/">chs.fuhsd.org</a></li>
+        </ul>
+      </div>
     </section>
   </main>
 

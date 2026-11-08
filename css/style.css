@@ -358,12 +358,30 @@ p {
   text-align: center;
 }
 
-.hero-logo {
+.hero-photo {
+  width: min(100%, 760px);
+  margin: 0 auto 24px;
+  background: var(--gray-2);
+}
+
+/* While there's no photo yet, the blank box holds a group-photo shape */
+.hero-photo:has(img:not([src])) {
+  aspect-ratio: 4 / 3;
+}
+
+.hero-photo img {
   display: block;
-  width: 168px;
-  height: 168px;
-  margin: 0 auto 18px;
-  border-radius: 50%;
+  width: 100%;
+  height: auto;
+}
+
+.hero-photo img:not([src]) {
+  display: none;
+}
+
+/* A swappable picture with no image yet stays blank instead of showing a broken-image icon */
+[data-cms-image]:not([src]) {
+  visibility: hidden;
 }
 
 .hero-title {
@@ -924,4 +942,71 @@ p {
 
 .cms-add:hover {
   background: #eef9f1;
+}
+
+.cms-login-note {
+  display: block;
+  max-width: 460px;
+  margin-top: 4px;
+  padding: 6px 10px;
+  border: 2px solid var(--green);
+  background: #ffffff;
+  font-size: 15px;
+  text-align: left;
+}
+
+/* Homepage editing: editable text waits for the saved version to load (shows anyway after 2.5 seconds) */
+body.cms-pending [data-cms-field],
+body.cms-pending [data-cms-image] {
+  opacity: 0;
+  animation: cms-reveal 0s 2.5s forwards;
+}
+
+/* Pictures officers add inside text */
+[data-cms-mode="rich"] img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 12px 0;
+}
+
+.banner img,
+.hero img,
+.callout img {
+  margin-inline: auto;
+}
+
+.cms-rich {
+  min-height: 1.6em;
+}
+
+.cms-rich img:hover {
+  outline: 2px solid var(--green-dark);
+  cursor: pointer;
+}
+
+.cms-image-tools {
+  justify-content: center;
+  margin: 8px 0 0;
+}
+
+.cms-format {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding-top: 8px;
+  border-top: 1px solid #3a3a3a;
+}
+
+.cms-format-label {
+  margin-right: 4px;
+  color: var(--green);
+  font-weight: 600;
+}
+
+.cms-format .cms-btn {
+  padding: 3px 10px;
+  font-size: 14px;
 }
